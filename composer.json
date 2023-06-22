@@ -1,0 +1,23 @@
+{
+    "name": "cjackiewicz/sg2023r",
+    "description": "SG 2023",
+    "type": "project",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Helpers\\": "src/Helpers/",
+            "Main\\": "src/Main"
+        }
+    },
+    "authors": [
+        {
+            "name": "Cezary Jackiewicz",
+            "email": "cjackiewicz11@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "symfony/console": "6.3.*",
+        "symfony/validator": "6.3.*"
+    }
+}

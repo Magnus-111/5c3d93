@@ -1,1 +1,9 @@
-
+version: "3.8"
+services:
+  php:
+    container_name: "php"
+    build:
+      context: ./
+      dockerfile: docker/php/Dockerfile
+    volumes:
+      - ./:/var/www/html
