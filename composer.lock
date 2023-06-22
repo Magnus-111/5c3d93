@@ -969,12 +969,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/validator.git",
-                "reference": "91786703d828f24b927b871a3a227ea954558bdb"
+                "reference": "1b71f43c62ee867ab08195ba6039a1bc3e6654dc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/validator/zipball/91786703d828f24b927b871a3a227ea954558bdb",
-                "reference": "91786703d828f24b927b871a3a227ea954558bdb",
+                "url": "https://api.github.com/repos/symfony/validator/zipball/1b71f43c62ee867ab08195ba6039a1bc3e6654dc",
+                "reference": "1b71f43c62ee867ab08195ba6039a1bc3e6654dc",
                 "shasum": ""
             },
             "require": {
@@ -1058,7 +1058,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-06-05T07:32:49+00:00"
+            "time": "2023-06-21T12:08:28+00:00"
         }
     ],
     "packages-dev": [],

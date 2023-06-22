@@ -19,9 +19,14 @@ try {
     echo $consoleStyler->apply("\t> Rozpoczynam prace.".PHP_EOL);
 
     // @todo: Dodać skrypt pytający, skąd ma pobrać plik źródłowy: katalog/wpisanie ścieżki przez użytkownika.
-    $fileHelper = new FileHelpers(__DIR__.DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."resource/data/");
+    // $fileHelper = new FileHelpers(__DIR__.DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."resource/data/");
+    // $data = $fileHelper->loadFiles("json");
 
-    $data = $fileHelper->loadFiles("json");
+    $fileHelper = new FileHelpers(
+        __DIR__.DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."resource/data/recruitment-task-source.json"
+    );
+
+    $data = $fileHelper->loadFromJsonFile();
 
     $parser = new Parser($data);
     $parser->analyseData();

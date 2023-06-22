@@ -52,23 +52,60 @@ class FileHelpers
     }
 
     /**
+     * @param $filePath
+     * @return mixed|void
+     * @throws \Exception
+     */
+    public function loadFromJsonFile() {
+        $file = pathinfo($this->resourcePath);
+
+        $data = [];
+        switch ($file['extension']) {
+            case 'json': {
+                $contentFile = file_get_contents($this->resourcePath);
+
+                if (empty($contentFile)) {
+                    throw new \Exception("Plik jest pusty");
+                }
+
+                $data = json_decode($contentFile, true);
+
+                if (json_last_error() != JSON_ERROR_NONE) {
+                    throw new \Exception("Błędny zapis w pliku. Nie zawiera formatu JSON");
+                }
+
+                return $data;
+            }
+            default:
+                break;
+        }
+    }
+
+    /**
      * @todo: Description
      * @throws \Exception
      */
-    public function loadFiles($extension) {
+    public function loadFiles($extension): array
+    {
 
         $resource = glob($this->resourcePath.DIRECTORY_SEPARATOR."*.$extension");
 
-        $data = "";
+        $data = [];
         foreach ($resource as $file) {
             $contentsFile = file_get_contents($file);
 
-            // @todo: przerobić, by funkcja była uniwersalna pod pliki, a nie miała zaimplementowane czytanie JSON.
-            $data = json_decode($contentsFile, true);
+            if (strtolower($extension) == 'json') {
+                // @todo: przerobić, by funkcja była uniwersalna pod pliki, a nie miała zaimplementowane czytanie JSON.
+                $data[] = json_decode($contentsFile, true);
 
-            if (json_last_error() != JSON_ERROR_NONE) {
-                throw new \Exception("Błędny zapis w pliku. Nie zawiera formatu JSON");
+                if (json_last_error() != JSON_ERROR_NONE) {
+                    throw new \Exception("Błędny zapis w pliku. Nie zawiera formatu JSON");
+                }
+
+                continue;
             }
+
+            echo "Notice: Nieobsługiwany rodzaj pliku".PHP_EOL;
 
         }
 
