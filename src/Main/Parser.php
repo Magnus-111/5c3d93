@@ -21,6 +21,8 @@ class Parser
     public function __construct(array $data)
     {
         $this->data = $data;
+        $this->reviews = [];
+        $this->crashReports = [];
     }
 
     /**
@@ -65,11 +67,29 @@ class Parser
      * @return void
      */
     public function analyseData(): void {
+        $uniqueEntries = [];
         foreach ($this->data as $row) {
-            if (str_contains($row["description"], "przegląd")) {
-                $this->reviews[] = $row;
-            } else {
-                $this->crashReports = $row;
+            $description = strtolower($row["description"]);
+            $uuid = sha1(strtolower($description));
+
+            if (!in_array($uuid, $uniqueEntries)) {
+
+                $uniqueEntries[] = $uuid;
+
+                if ($this->defineEntity($description, '/(.*)przegląd(.*)/')) {
+                    $this->reviews[] = $row;
+                    echo "Numer {$row['number']} określono jako przegląd.".PHP_EOL;
+                    continue;
+                }
+
+                if ($this->defineEntity($description,'/(.*)awari(.*)/' )) {
+                    $this->crashReports = $row;
+                    echo "Numer {$row['number']} określono jako zgłoszenie awarii.".PHP_EOL;
+                    continue;
+                }
+
+                echo "Numer {$row['number']} nie został określony.".PHP_EOL;
+
             }
         }
     }
@@ -108,5 +128,39 @@ class Parser
     public function countUnrecognized(): int
     {
         return $this->sizeData() - $this->countReviews() - $this->countCrashReports();
+    }
+
+    /**
+     * @param $description
+     * @param $pattern
+     * @return bool
+     */
+    private function defineEntity($description, $pattern): bool
+    {
+        preg_match_all($pattern, $description, $matches, PREG_SET_ORDER);
+
+        return count($matches) > 0;
+    }
+
+    private function defineStatus($date)
+    {
+        
+    }
+
+    private function definePriority()
+    {
+
+    }
+
+    private function createReview($data) {
+        return [
+
+        ];
+    }
+
+    private function createCrash($data) {
+        return [
+
+        ];
     }
 }
