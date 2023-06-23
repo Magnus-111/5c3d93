@@ -7,6 +7,9 @@
 
 namespace Data;
 
+use Helpers\AnalyseHelper;
+use JetBrains\PhpStorm\ArrayShape;
+
 class CrashReport extends Entity
 {
     private string $priority;
@@ -14,13 +17,40 @@ class CrashReport extends Entity
 
     private string $commentService;
 
-    public function __construct($description, $priority, $dateServiceVisit, $status, $commentService, $clientPhone)
+    public function __construct($description, $dateServiceVisit, $clientPhone)
     {
+        $this->description = $description;
+        $this->dateServiceVisit = $dateServiceVisit;
+        $this->priority = $this->definePriority($description);
+        $this->clientPhone = $clientPhone;
         $this->type = "zgłoszenie awarii";
+        $this->status = $this->defineStatus($dateServiceVisit);
+        $this->commentService = "";
         $this->creationDate = date("Y-m-d H:i:s");
     }
 
-    function jsonSerialize(): array
+    /**
+     * @param $description
+     * @return string
+     */
+    private function definePriority($description): string
+    {
+        if (AnalyseHelper::define($description, '/(.*)bardzo piln(.*)/')) {
+            return "krytyczny";
+        }
+
+        if (AnalyseHelper::define($description, '/(.*)piln(.*)/')) {
+            return "wysoki";
+        }
+
+        return "normalny";
+    }
+
+    /**
+     * @return array
+     */
+    #[ArrayShape(["opis" => "string", "typ" => "string", "priorytet" => "string", "termin wizyty serwisu" => "string", "status" => "string", "uwagi serwisu" => "string", "numer telefonu osoby do kontaktu po stronie klienta" => "string", "data utworzenia" => "string"])]
+    public function jsonSerialize(): array
     {
         return [
             "opis" => $this->description,
@@ -32,5 +62,14 @@ class CrashReport extends Entity
             "numer telefonu osoby do kontaktu po stronie klienta" => $this->clientPhone,
             "data utworzenia" => $this->creationDate
         ];
+    }
+
+    protected function defineStatus($dueDate): string
+    {
+        if (!empty($dueDate)) {
+            return "termin";
+        }
+
+        return "nowy";
     }
 }

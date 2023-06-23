@@ -7,6 +7,8 @@
 
 namespace Data;
 
+use JetBrains\PhpStorm\ArrayShape;
+
 class Review extends Entity
 {
 
@@ -16,13 +18,23 @@ class Review extends Entity
 
     private string $serviceRecommendations;
 
-    public function __construct($description, $reviewDate, $weekOfYear, $status, $serviceRecommendations, $clientPhone)
+    public function __construct($description, $reviewDate, $clientPhone)
     {
+        $this->description = $description;
+        $this->reviewDate = $reviewDate;
+        $this->weekOfYear = date("W",  strtotime($reviewDate));
+        $this->clientPhone = $clientPhone;
         $this->type = 'przegląd';
+        $this->status = $this->defineStatus($reviewDate);
+        $this->serviceRecommendations = "";
         $this->creationDate = date("Y-m-d H:i:s");
     }
 
-    function jsonSerialize(): array
+    /**
+     * @return array
+     */
+    #[ArrayShape(["opis" => "string", "typ" => "string", "data przeglądu" => "string", "tydzień w roku daty przeglądu" => "string", "status" => "string", "zalecenia dalszej obsługi po przeglądzie" => "string", "numer telefonu osoby do kontaktu po stronie klienta" => "string", "data utworzenia" => "string"])]
+    public function jsonSerialize(): array
     {
         return [
             "opis" => $this->description,
@@ -34,5 +46,18 @@ class Review extends Entity
             "numer telefonu osoby do kontaktu po stronie klienta" => $this->clientPhone,
             "data utworzenia" => $this->creationDate
         ];
+    }
+
+    /**
+     * @param $dueDate
+     * @return string
+     */
+    protected function defineStatus($dueDate): string
+    {
+        if (!empty($dueDate)) {
+            return "zaplanowano";
+        }
+
+        return "nowy";
     }
 }

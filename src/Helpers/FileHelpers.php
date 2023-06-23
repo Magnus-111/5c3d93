@@ -7,6 +7,8 @@
 
 namespace Helpers;
 
+use mysql_xdevapi\Exception;
+
 /**
  * @todo: Description
  */
@@ -110,5 +112,21 @@ class FileHelpers
         }
 
         return $data;
+    }
+
+    /**
+     * @param $data
+     * @param $path
+     * @return void
+     */
+    public static function saveToFile($data, $path): void
+    {
+        try {
+            $file = fopen($path, "w");
+            fwrite($file, $data);
+            fclose($file);
+        } catch (\Exception $e) {
+            echo $e->getMessage().PHP_EOL;
+        }
     }
 }

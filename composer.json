@@ -5,6 +5,7 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
+            "Data\\": "src/Data",
             "Helpers\\": "src/Helpers/",
             "Main\\": "src/Main"
         }

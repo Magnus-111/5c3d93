@@ -16,7 +16,7 @@ try {
     $consoleStyler->setBackground("cyan");
     $consoleStyler->setForeground("black");
 
-    echo $consoleStyler->apply("\t> Rozpoczynam prace.".PHP_EOL);
+    echo $consoleStyler->apply("\t> Start work.".PHP_EOL);
 
     // @todo: Dodać skrypt pytający, skąd ma pobrać plik źródłowy: katalog/wpisanie ścieżki przez użytkownika.
     // $fileHelper = new FileHelpers(__DIR__.DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."resource/data/");
@@ -33,11 +33,12 @@ try {
     echo "Liczba zgłoszeń awarii: ".$parser->countCrashReports().PHP_EOL;
     echo "Liczba przeglądów: ".$parser->countReviews().PHP_EOL;
     echo "Liczba nieprzetworzonych: ".$parser->countUnrecognized().PHP_EOL;
+    echo "Pliki wynikowe w katalogu `output`.".PHP_EOL;
 
 } catch (Exception $e) {
     $consoleStyler = new OutputFormatterStyle();
     $consoleStyler->setBackground("red");
-    $consoleStyler->setForeground("white");
+    $consoleStyler->setForeground("black");
     echo $consoleStyler->apply("\t! Error: ".$e->getMessage().PHP_EOL);
 }
 
