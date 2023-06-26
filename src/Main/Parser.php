@@ -7,9 +7,12 @@
 
 namespace Main;
 
+use Data\CrashReport;
 use Data\EntityFactory;
+use Data\Review;
 use Helpers\AnalyseHelper;
 use Helpers\FileHelpers;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 
 /**
  * @todo: Description
@@ -24,6 +27,8 @@ class Parser
 
     private array $unrecognized;
 
+    private int $duplicates;
+
     private EntityFactory $entityFactory;
 
     public function __construct(array $data)
@@ -32,6 +37,7 @@ class Parser
         $this->reviews = [];
         $this->crashReports = [];
         $this->unrecognized = [];
+        $this->duplicates = 0;
         $this->entityFactory = new EntityFactory();
     }
 
@@ -73,11 +79,12 @@ class Parser
     }
 
     /**
+     * @param OutputFormatterStyle $consoleStyler
      * @return void
      * @throws \Exception
      * @todo: Description
      */
-    public function analyseData(): void {
+    public function analyseData(OutputFormatterStyle $consoleStyler): void {
         $uniqueEntries = [];
         foreach ($this->data as $row) {
             $description = strtolower($row["description"]);
@@ -87,21 +94,26 @@ class Parser
 
                 $uniqueEntries[] = $uuid;
 
-                if (AnalyseHelper::define($description, '/(.*)przegląd(.*)/')) {
-                    $this->reviews[] = $this->entityFactory->factory("review", $row);
-                    echo "Numer {$row['number']} określono jako przegląd.".PHP_EOL;
-                    continue;
+                $consoleStyler->setBackground("green");
+                $consoleStyler->setForeground("black");
+
+                $entity = $this->entityFactory->factory($row);
+                if ($entity instanceof Review) {
+                    $this->reviews[] = $entity;
+                    echo $consoleStyler->apply("The number {$row['number']} define as \"przegląd\".".PHP_EOL);
+                } else if ($entity instanceof CrashReport) {
+                    $this->crashReports[] = $entity;
+                    echo $consoleStyler->apply("The number {$row['number']} define as \"zgłoszenie awarii\"." . PHP_EOL);
+                } else {
+                    $this->unrecognized[] = $row;
+                    echo $consoleStyler->apply("The number {$row['number']} did not have a match." . PHP_EOL);
                 }
 
-                if (AnalyseHelper::define($description,'/(.*)awari(.*)/')) {
-                    $this->crashReports[] = $this->entityFactory->factory("crashRaport", $row);
-                    echo "Numer {$row['number']} określono jako zgłoszenie awarii.".PHP_EOL;
-                    continue;
-                }
-
-                $this->unrecognized[] = $row;
-                echo "Numer {$row['number']} nie został określony.".PHP_EOL;
-
+            } else {
+                $consoleStyler->setBackground("bright-yellow");
+                $consoleStyler->setForeground("black");
+                $this->duplicates++;
+                echo $consoleStyler->apply("The number {$row['number']} is duplicate. Same description.".PHP_EOL);
             }
         }
 
@@ -143,6 +155,15 @@ class Parser
      * @todo: Description
      * @return int
      */
+    public function countDuplicates(): int
+    {
+        return $this->duplicates;
+    }
+
+    /**
+     * @todo: Description
+     * @return int
+     */
     public function sizeData(): int
     {
         return count($this->data);
@@ -154,6 +175,6 @@ class Parser
      */
     public function countUnrecognized(): int
     {
-        return $this->sizeData() - $this->countReviews() - $this->countCrashReports();
+        return count($this->unrecognized);
     }
 }

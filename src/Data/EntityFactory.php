@@ -8,6 +8,7 @@
 namespace Data;
 
 use Exception;
+use Helpers\AnalyseHelper;
 
 class EntityFactory implements EntityFactoryInterface
 {
@@ -15,17 +16,17 @@ class EntityFactory implements EntityFactoryInterface
     /**
      * @throws Exception
      */
-    public function factory(string $type, array $data): Review|CrashReport
+    public function factory(array $data): Review|CrashReport|null
     {
         extract($data);
-        if ($type == 'review') {
-            return new Review($description, $dueDate, $phone);
+        try {
+            if (AnalyseHelper::define($description, '/(.*)przegląd(.*)/')) {
+                return new Review($description, $dueDate, $phone);
+            } else {
+                return new CrashReport($description, $dueDate, $phone);
+            }
+        } catch (Exception $e) {
+            return null;
         }
-
-        if ($type == 'crashRaport') {
-            return new CrashReport($description, $dueDate, $phone);
-        }
-
-        throw new Exception("Unrecognized type of entity.");
     }
 }

@@ -7,7 +7,7 @@
 
 namespace Helpers;
 
-use mysql_xdevapi\Exception;
+use \Exception;
 
 /**
  * @todo: Description
@@ -54,26 +54,26 @@ class FileHelpers
     }
 
     /**
-     * @param $filePath
      * @return mixed|void
-     * @throws \Exception
+     * @throws Exception
      */
     public function loadFromJsonFile() {
         $file = pathinfo($this->resourcePath);
 
         $data = [];
+
+        $contentFile = file_get_contents($this->resourcePath);
+
+        if (empty($contentFile)) {
+            throw new Exception("Warning: File is empty.");
+        }
+
         switch ($file['extension']) {
             case 'json': {
-                $contentFile = file_get_contents($this->resourcePath);
-
-                if (empty($contentFile)) {
-                    throw new \Exception("Plik jest pusty");
-                }
-
                 $data = json_decode($contentFile, true);
 
                 if (json_last_error() != JSON_ERROR_NONE) {
-                    throw new \Exception("Błędny zapis w pliku. Nie zawiera formatu JSON");
+                    throw new Exception("Wrong data in file. Content is not correct JSON.");
                 }
 
                 return $data;
@@ -96,18 +96,22 @@ class FileHelpers
         foreach ($resource as $file) {
             $contentsFile = file_get_contents($file);
 
+            if (empty($contentFile)) {
+                throw new Exception("Warning: File is empty.");
+            }
+
             if (strtolower($extension) == 'json') {
                 // @todo: przerobić, by funkcja była uniwersalna pod pliki, a nie miała zaimplementowane czytanie JSON.
                 $data[] = json_decode($contentsFile, true);
 
                 if (json_last_error() != JSON_ERROR_NONE) {
-                    throw new \Exception("Błędny zapis w pliku. Nie zawiera formatu JSON");
+                    throw new Exception("Wrong data in file. Content is not correct JSON.");
                 }
 
                 continue;
             }
 
-            echo "Notice: Nieobsługiwany rodzaj pliku".PHP_EOL;
+            throw new Exception("Notice: Unsupported file extension.");
 
         }
 

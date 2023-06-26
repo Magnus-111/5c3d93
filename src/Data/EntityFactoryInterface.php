@@ -8,5 +8,5 @@
 namespace Data;
 
 interface EntityFactoryInterface {
-    public function factory(string $type, array $data);
+    public function factory(array $data): null|CrashReport|Review;
 }

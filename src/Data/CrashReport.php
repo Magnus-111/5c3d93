@@ -8,19 +8,20 @@
 namespace Data;
 
 use Helpers\AnalyseHelper;
+use Helpers\ValidationHelper;
 use JetBrains\PhpStorm\ArrayShape;
 
 class CrashReport extends Entity
 {
     private string $priority;
-    private string $dateServiceVisit;
+    private ?string $dateServiceVisit;
 
     private string $commentService;
 
     public function __construct($description, $dateServiceVisit, $clientPhone)
     {
         $this->description = $description;
-        $this->dateServiceVisit = $dateServiceVisit;
+        $this->dateServiceVisit = ValidationHelper::isValidDate($dateServiceVisit) ? $dateServiceVisit : null;
         $this->priority = $this->definePriority($description);
         $this->clientPhone = $clientPhone;
         $this->type = "zgłoszenie awarii";
@@ -64,9 +65,13 @@ class CrashReport extends Entity
         ];
     }
 
-    protected function defineStatus($dueDate): string
+    /**
+     * @param string|null $dueDate
+     * @return string|null
+     */
+    protected function defineStatus(?string $dueDate): ?string
     {
-        if (!empty($dueDate)) {
+        if (ValidationHelper::isValidDate($dueDate)) {
             return "termin";
         }
 

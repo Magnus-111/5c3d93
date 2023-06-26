@@ -7,22 +7,23 @@
 
 namespace Data;
 
+use Helpers\ValidationHelper;
 use JetBrains\PhpStorm\ArrayShape;
 
 class Review extends Entity
 {
 
-    private string $reviewDate;
+    private ?string $reviewDate;
 
-    private string $weekOfYear;
+    private ?string $weekOfYear;
 
     private string $serviceRecommendations;
 
     public function __construct($description, $reviewDate, $clientPhone)
     {
         $this->description = $description;
-        $this->reviewDate = $reviewDate;
-        $this->weekOfYear = date("W",  strtotime($reviewDate));
+        $this->reviewDate = ValidationHelper::isValidDate($reviewDate) ? $reviewDate : null;
+        $this->weekOfYear = ValidationHelper::isValidDate($reviewDate) ? date("W",  strtotime($reviewDate)) : null;
         $this->clientPhone = $clientPhone;
         $this->type = 'przegląd';
         $this->status = $this->defineStatus($reviewDate);
@@ -49,12 +50,12 @@ class Review extends Entity
     }
 
     /**
-     * @param $dueDate
-     * @return string
+     * @param string|null $dueDate
+     * @return string|null
      */
-    protected function defineStatus($dueDate): string
+    protected function defineStatus(?string $dueDate): ?string
     {
-        if (!empty($dueDate)) {
+        if (ValidationHelper::isValidDate($dueDate)) {
             return "zaplanowano";
         }
 

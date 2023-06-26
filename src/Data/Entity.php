@@ -15,8 +15,12 @@ abstract class Entity implements JsonSerializable
     protected string $type;
     protected string $status;
     protected string $creationDate;
-    protected string $clientPhone;
+    protected ?string $clientPhone;
 
-    abstract protected function defineStatus($dueDate);
+    /**
+     * @param string|null $dueDate
+     * @return string|null
+     */
+    abstract protected function defineStatus(?string $dueDate): ?string;
     abstract public function jsonSerialize(): array;
 }
